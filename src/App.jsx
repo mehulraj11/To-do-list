@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
-
+import { useState } from "react";
+import Task from "./Task";
+export default function App() {
+  const [completedTasks, setCompletedTasks] = useState(0);
+  const [taskArray, setTaskArray] = useState([]);
+  const [task, setTask] = useState("");
+  const handleTaskInput = (e) => {
+    setTask(e.target.value);
+  };
+  const handleAddTask = (e) => {
+    e.preventDefault();
+    setTaskArray([...taskArray, task]);
+    setTask("");
+    console.log(taskArray);
+  };
+  const renderTask = taskArray.map((item, index) => {
+    return (
+      <Task
+        key={index}
+        taskArray={taskArray}
+        setTaskArray={setTaskArray}
+        item={item}
+        index={index}
+        completedTasks={completedTasks}
+        setCompletedTasks={setCompletedTasks}
+      />
+    );
+  });
   return (
-    <>
+    <div>
+      <form>
+        <input
+          type="text"
+          placeholder="Enter your task"
+          value={task}
+          onChange={handleTaskInput}
+        />
+        <button onClick={handleAddTask}>Add task</button>
+      </form>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {/* <Task taskArray={taskArray}/> */}
+        {renderTask}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      {`${completedTasks} / ${taskArray.length}`}
+    </div>
+  );
 }
-
-export default App
