@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import './task.css';
+import React, { useState } from "react";
+import "./task.css";
 
 const Task = ({
   taskArray,
@@ -10,8 +10,8 @@ const Task = ({
   completedTasks,
 }) => {
   const [checkboxValue, setCheckboxValue] = useState(false);
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [editedTask, setEditedTask] = useState(item);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTask, setEditedTask] = useState("");
 
   const handleClick = () => {
     setCheckboxValue(!checkboxValue);
@@ -24,42 +24,52 @@ const Task = ({
 
   const deleteTask = (taskIndex) => {
     const updatedTaskArray = [...taskArray];
-    const filtered = updatedTaskArray.filter((item, index) => index !== taskIndex);
+    const filtered = updatedTaskArray.filter(
+      (item, index) => index !== taskIndex
+    );
     setTaskArray(filtered);
-    console.log(index + ' has been deleted');
+    console.log(index + " has been deleted");
   };
 
   const handleEditChange = (e) => {
     setEditedTask(e.target.value);
   };
-
-  const editTask = (taskIndex) => {
-    const updatedTaskArray = [...taskArray];
-    updatedTaskArray[taskIndex] = editedTask;
-    setTaskArray(updatedTaskArray);
-    setIsEditing(false);
-  };
-
   const handleEditClick = () => {
     setIsEditing(true);
+    console.log(isEditing);
     setEditedTask(item);
   };
-
+  const handleSave = (index) => {
+    if (editedTask) {
+      const updatedTaskArray = [...taskArray];
+      updatedTaskArray[index] = editedTask;
+      setTaskArray(updatedTaskArray);
+      setIsEditing(false);
+    } else {
+      alert(`Enter task`);
+    }
+  };
+  function handleClear() {
+    setEditedTask("");
+  }
   return (
     <div className="task">
       <input type="checkbox" checked={checkboxValue} onChange={handleClick} />
-      {/* {isEditing ? (
+      {isEditing ? (
         <input type="text" value={editedTask} onChange={handleEditChange} />
       ) : (
         <p>{item}</p>
       )}
       {isEditing ? (
-        <button onClick={() => editTask(index)}>Save</button>
+        <button onClick={() => handleSave(index)}>Save</button>
       ) : (
         <button onClick={handleEditClick}>Edit</button>
-      )} */}
-      {item}
-      <button onClick={() => deleteTask(index)}>Delete</button>
+      )}
+      {isEditing ? (
+        <button onClick={handleClear}>Clear</button>
+      ) : (
+        <button onClick={() => deleteTask(index)}>Delete</button>
+      )}
     </div>
   );
 };

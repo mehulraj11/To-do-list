@@ -9,8 +9,12 @@ export default function App() {
   };
   const handleAddTask = (e) => {
     e.preventDefault();
-    setTaskArray([...taskArray, task]);
-    setTask("");
+    if (task) {
+      setTaskArray([...taskArray, task]);
+      setTask("");
+    } else {
+      alert(`Enter task`);
+    }
     console.log(taskArray);
   };
   const renderTask = taskArray.map((item, index) => {
