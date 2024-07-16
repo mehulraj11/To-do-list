@@ -28,17 +28,17 @@ const Task = ({
       (item, index) => index !== taskIndex
     );
     setTaskArray(filtered);
-    console.log(index + " has been deleted");
   };
 
   const handleEditChange = (e) => {
     setEditedTask(e.target.value);
   };
+
   const handleEditClick = () => {
     setIsEditing(true);
-    console.log(isEditing);
     setEditedTask(item);
   };
+
   const handleSave = (index) => {
     if (editedTask) {
       const updatedTaskArray = [...taskArray];
@@ -49,9 +49,11 @@ const Task = ({
       alert(`Enter task`);
     }
   };
-  function handleClear() {
+
+  const handleClear = () => {
     setEditedTask("");
-  }
+  };
+
   return (
     <div className="task">
       <input type="checkbox" checked={checkboxValue} onChange={handleClick} />
@@ -68,7 +70,7 @@ const Task = ({
       {isEditing ? (
         <button onClick={handleClear}>Clear</button>
       ) : (
-        <button onClick={() => deleteTask(index)}>Delete</button>
+        <button className="delete" onClick={() => deleteTask(index)}>Delete</button>
       )}
     </div>
   );

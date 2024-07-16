@@ -1,12 +1,16 @@
 import { useState } from "react";
 import Task from "./Task";
+import "./task.css";
+
 export default function App() {
   const [completedTasks, setCompletedTasks] = useState(0);
   const [taskArray, setTaskArray] = useState([]);
   const [task, setTask] = useState("");
+
   const handleTaskInput = (e) => {
     setTask(e.target.value);
   };
+
   const handleAddTask = (e) => {
     e.preventDefault();
     if (task) {
@@ -15,8 +19,8 @@ export default function App() {
     } else {
       alert(`Enter task`);
     }
-    console.log(taskArray);
   };
+
   const renderTask = taskArray.map((item, index) => {
     return (
       <Task
@@ -30,8 +34,9 @@ export default function App() {
       />
     );
   });
+
   return (
-    <div>
+    <div className="container">
       <form>
         <input
           type="text"
@@ -42,10 +47,9 @@ export default function App() {
         <button onClick={handleAddTask}>Add task</button>
       </form>
       <div>
-        {/* <Task taskArray={taskArray}/> */}
         {renderTask}
       </div>
-      {`${completedTasks} / ${taskArray.length}`}
+      <p>{`${completedTasks} / ${taskArray.length}`}</p>
     </div>
   );
 }
