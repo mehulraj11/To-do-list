@@ -1,0 +1,41 @@
+# ✅ To-do-list App
+
+A full-stack task management app built with **Express.js**, **MongoDB**, and a frontend (e.g., React/Vite) compiled into a static `dist/` folder.
+
+## 🛠 Features
+
+- Add, edit, delete tasks
+- Mark tasks as completed
+- View total vs. completed task count
+- REST API with MongoDB backend
+- Serves built frontend using Express
+
+---
+
+## ⚙️ Technologies Used
+
+- **Frontend**: React + Vite (assumed)
+- **Backend**: Express.js
+- **Database**: MongoDB with Mongoose
+- **Others**: Morgan, CORS
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/To-do-list.git
+cd To-do-list
+npm install
+# Ubuntu
+sudo systemctl start mongod
+
+# or using brew on Mac
+brew services start mongodb-community
+# If using Vite
+npm run build
+#Run server
+npm run dev
+```
