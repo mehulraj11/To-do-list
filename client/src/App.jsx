@@ -1,55 +1,88 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Task from "./Task";
 import "./task.css";
 
 export default function App() {
-  const [completedTasks, setCompletedTasks] = useState(0);
-  const [taskArray, setTaskArray] = useState([]);
-  const [task, setTask] = useState("");
+  const [taskInput, setTaskInput] = useState("");
+  const [taskList, setTaskList] = useState([]);
+  const [completedCount, setCompletedCount] = useState(0);
 
-  const handleTaskInput = (e) => {
-    setTask(e.target.value);
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const res = await fetch("http://localhost:1000/");
+        const data = await res.json();
+        setTaskList(data);
+      } catch (err) {
+        console.error("Error fetching tasks:", err);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const handleInputChange = (e) => {
+    setTaskInput(e.target.value);
   };
 
-  const handleAddTask = (e) => {
+  const handleAddTask = async (e) => {
     e.preventDefault();
-    if (task) {
-      setTaskArray([...taskArray, task]);
-      setTask("");
-    } else {
-      alert(`Enter task`);
+
+    const trimmedTask = taskInput.trim();
+    if (!trimmedTask) {
+      alert("No empty task is allowed");
+      return;
+    }
+
+    const newTask = { task: trimmedTask };
+
+    try {
+      const res = await fetch("http://localhost:1000/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTask),
+      });
+
+      if (res.ok) {
+        setTaskList((prev) => [...prev, newTask]);
+        setTaskInput("");
+      } else {
+        console.log("Failed to add task");
+      }
+    } catch (err) {
+      console.error("Error adding task:", err);
     }
   };
 
-  const renderTask = taskArray.map((item, index) => {
-    return (
-      <Task
-        key={index}
-        taskArray={taskArray}
-        setTaskArray={setTaskArray}
-        item={item}
-        index={index}
-        completedTasks={completedTasks}
-        setCompletedTasks={setCompletedTasks}
-      />
-    );
-  });
+  const renderTasks = taskList.map((task) => (
+    <Task
+      key={task.taskId}
+      index={task.taskId}
+      taskArray={taskList}
+      setTaskArray={setTaskList}
+      item={task.task}
+      completedTasks={completedCount}
+      setCompletedTasks={setCompletedCount}
+    />
+  ));
 
   return (
     <div className="container">
-      <form>
+      <form onSubmit={handleAddTask}>
         <input
           type="text"
           placeholder="Enter your task"
-          value={task}
-          onChange={handleTaskInput}
+          value={taskInput}
+          onChange={handleInputChange}
         />
-        <button onClick={handleAddTask}>Add task</button>
+        <button type="submit">Add Task</button>
       </form>
-      <div>
-        {renderTask}
-      </div>
-      <p>{`${completedTasks} / ${taskArray.length}`}</p>
+
+      {renderTasks}
+
+      {taskList.length > 0 && (
+        <p>{`${completedCount} / ${taskList.length} tasks completed`}</p>
+      )}
     </div>
   );
 }

@@ -1,76 +1,125 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./task.css";
 
 const Task = ({
-  taskArray,
-  setTaskArray,
   item,
   index,
+  taskArray,
+  setTaskArray,
+  completedTask,
   setCompletedTasks,
-  completedTasks,
 }) => {
   const [checkboxValue, setCheckboxValue] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTask, setEditedTask] = useState("");
+  const [editedTask, setEditedTask] = useState(item);
 
-  const handleClick = () => {
-    setCheckboxValue(!checkboxValue);
-    if (checkboxValue) {
-      setCompletedTasks(completedTasks - 1);
-    } else {
-      setCompletedTasks(completedTasks + 1);
+  const deleteTask = async (e, taskIndex) => {
+    e.preventDefault();
+    console.log(taskIndex);
+
+    try {
+      const res = await fetch(`http://localhost:1000/${taskIndex}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setTaskArray((prevArray) =>
+          prevArray.filter((item) => item.taskId !== taskIndex)
+        );
+        setCompletedTasks((prev) => prev - 1);
+        console.log("Task deleted");
+      } else {
+        console.log("Failed to delete");
+      }
+    } catch (error) {
+      console.log("Error deleting task:", error);
     }
   };
-
-  const deleteTask = (taskIndex) => {
-    const updatedTaskArray = [...taskArray];
-    const filtered = updatedTaskArray.filter(
-      (item, index) => index !== taskIndex
-    );
-    setTaskArray(filtered);
+  const editTask = (e) => {
+    setIsEditing(!isEditing);
   };
-
   const handleEditChange = (e) => {
     setEditedTask(e.target.value);
   };
+  const handleSave = async (e, taskId) => {
+    if (!editedTask.trim()) {
+      alert("Task cannot be empty");
+      return;
+    }
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-    setEditedTask(item);
-  };
+    try {
+      const response = await fetch(`http://localhost:1000/${taskId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ task: editedTask }),
+      });
 
-  const handleSave = (index) => {
-    if (editedTask) {
-      const updatedTaskArray = [...taskArray];
-      updatedTaskArray[index] = editedTask;
-      setTaskArray(updatedTaskArray);
-      setIsEditing(false);
-    } else {
-      alert(`Enter task`);
+      if (response.ok) {
+        const updatedTask = await response.json();
+
+        setTaskArray((prevArray) =>
+          prevArray.map((task) =>
+            task.taskId === taskId ? { ...task, task: updatedTask.task } : task
+          )
+        );
+        setIsEditing(false);
+      } else {
+        console.log("Failed to update task");
+      }
+    } catch (error) {
+      console.error("Error updating task:", error);
     }
   };
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
+  const handleCheckBoxClick = (e) => {
+    const isChecked = e.target.checked;
+    setCheckboxValue(isChecked);
 
-  const handleClear = () => {
-    setEditedTask("");
+    if (isChecked) {
+      setCompletedTasks((prev) => prev + 1);
+    } else {
+      setCompletedTasks((prev) => prev - 1);
+    }
   };
 
   return (
     <div className="task">
-      <input type="checkbox" checked={checkboxValue} onChange={handleClick} />
+      <input
+        type="checkbox"
+        checked={checkboxValue}
+        onChange={handleCheckBoxClick}
+      />
       {isEditing ? (
-        <input type="text" value={editedTask} onChange={handleEditChange} />
+        <input
+          className="task"
+          value={editedTask}
+          onChange={handleEditChange}
+        ></input>
       ) : (
-        <p>{item}</p>
+        <p key={index}>{item}</p>
       )}
       {isEditing ? (
-        <button onClick={() => handleSave(index)}>Save</button>
+        <>
+          <button className="edit" onClick={(e) => handleSave(e, index)}>
+            Save
+          </button>
+          <button className="delete" onClick={() => handleCancel()}>
+            Cancel
+          </button>
+        </>
       ) : (
-        <button onClick={handleEditClick}>Edit</button>
-      )}
-      {isEditing ? (
-        <button onClick={handleClear}>Clear</button>
-      ) : (
-        <button className="delete" onClick={() => deleteTask(index)}>Delete</button>
+        <>
+          <button className="edit" onClick={(e) => editTask(e, index)}>
+            Edit
+          </button>
+          <button className="delete" onClick={(e) => deleteTask(e, index)}>
+            Delete
+          </button>
+        </>
       )}
     </div>
   );
