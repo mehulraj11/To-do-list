@@ -57,5 +57,24 @@ const updateTask = async (req, res) => {
 };
 
 
+const putMethod = async (req, res) => {
+    try {
+        const updated = await taskModel.replaceOne(
 
-export { create, getAll, deleteTask, updateTask }
+            { taskId: req.params.id },
+            req.body
+        )
+        if (updated.matchedCount === 0) {
+            return res.status(400).json({ message: "Task not found" })
+        }
+        res.status(200).json({ message: "Task updated successfully", updatedFields: req.body });
+
+
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500)
+
+
+    }
+}
+export { create, getAll, deleteTask, updateTask, putMethod }

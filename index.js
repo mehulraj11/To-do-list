@@ -29,7 +29,7 @@ const main = async () => {
 main();
 
 // Middleware
-server.use(express.static("dist"))
+// server.use(express.static("dist"))
 server.use(cors());
 server.use(morgan("dev"));
 server.use(express.json());
@@ -38,6 +38,6 @@ server.use(express.json());
 server.use("/", taskRouter);
 
 // Start server
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
